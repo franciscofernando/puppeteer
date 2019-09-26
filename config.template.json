@@ -1,0 +1,15 @@
+{
+	"projects": {
+		"project-name": {
+			"path": "project-absolute-path",
+			"script": "yarn local"
+		},
+		"project-name2": {
+			"path": "project-absolute-path2",
+			"script": "yarn local"
+		}
+	},
+	"clusters" : {
+		"local": ["project-name", "project-name2"]
+	}
+}
