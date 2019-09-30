@@ -11,6 +11,7 @@ module.exports = (projects) => {
 			title = title.padStart((process.stdout.columns + project.name.length) / 2);
 			title = title.padEnd(process.stdout.columns);
 		console.log(colors.bgCyan(title));
+		console.log('');
 		
 		project.logs.forEach((logData) => {
 			log(project, logData);
@@ -36,12 +37,15 @@ module.exports = (projects) => {
 			name: 'project',
 			message: 'Select a project',
 			choices: Object.keys(projects).map((projectName) => {
-				return { 
-					title: projectName, 
-					description: 'Show logs.', 
-					value: projects[projectName]
-				};
-			})
+				if (!projects[projectName].active) {
+					return { 
+						title: projectName, 
+						description: 'Show logs.', 
+						value: projects[projectName]
+					};
+				}
+				return undefined;
+			}).filter(item => !!item)
 		}, {
 			onCancel: () => {
 				Object.keys(projects).forEach((projectName) => {
