@@ -13,16 +13,24 @@ try {
 	return;
 }
 
+const { projects: projectsConfigs, clusters } = config;
+
 try {
-	cluster = config.clusters[process.argv.slice(2)[0]];
+	cluster = clusters[process.argv.slice(2)[0]];
 	if (!cluster) {
 		throw 'cluster not found';
 	}
-	cluster = cluster.map(projectName => {
-		if (config.projects[projectName]) {
-			return projectName;
+	cluster = cluster.map(projectInstruction => {
+		const [projectName, projectScriptName] = projectInstruction.split(/\:/g);
+		
+		if (projectsConfigs[projectName]) {
+			if (projectsConfigs[projectName].scripts[projectScriptName]) {
+				return { projectName, projectScriptName };				
+			} else {
+				throw `script ${projectScriptName} of project ${projectScriptName} not found.`;
+			}
 		} else {
-			throw `project ${projectName} not found.`;
+			throw `project ${projectScriptName} not found.`;
 		}
 	});
 } catch(e) {
@@ -38,9 +46,9 @@ try {
 
 const projects = {};
 
-cluster.forEach(async projectName => {
-	const projectConfig = config.projects[projectName];
-	const child = spawn(projectConfig.script, [], {
+cluster.forEach(async ({ projectName, projectScriptName }) => {
+	const projectConfig = projectsConfigs[projectName];
+	const child = spawn(projectConfig.scripts[projectScriptName], [], {
 		cwd: projectConfig.path,
 		shell: true
 	});

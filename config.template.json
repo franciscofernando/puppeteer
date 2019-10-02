@@ -2,14 +2,20 @@
 	"projects": {
 		"project-name": {
 			"path": "project-absolute-path",
-			"script": "yarn local"
+			"scripts": {
+				"local": "yarn local",
+				"dev": "yarn dev"
+			}
 		},
 		"project-name2": {
 			"path": "project-absolute-path2",
-			"script": "yarn local"
+			"scripts": {
+				"local": "yarn local",
+				"dev": "yarn dev"
+			}
 		}
 	},
 	"clusters" : {
-		"local": ["project-name", "project-name2"]
+		"local": ["project-name:local", "project-name2:dev"]
 	}
 }

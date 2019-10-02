@@ -20,39 +20,52 @@ module.exports = (projects) => {
 		projectSelect();
 	};
 
-	const onProjectSelect = (questions, response, responses) => {
+	const onProjectClose = () => {
 		Object.keys(projects).forEach((projectName) => {
-			projects[projectName].active = false;
+			kill(projects[projectName].child.pid);
 		});
+		clear();
+		console.log('All process has killed!');
+	};
 
-		printLogs(response);
+	const onProjectSelect = (questions, response, responses) => {
+		if (response !== 'CLOSE') {
+			Object.keys(projects).forEach((projectName) => {
+				projects[projectName].active = false;
+			});
+
+			printLogs(response);
+		} else {
+			onProjectClose();
+		}
 	};
 
 	const projectSelect = () => {
 		process.stdin.removeAllListeners('keypress');
 		if (process.stdin.isTTY) process.stdin.setRawMode(false);
 		
+		const options = Object.keys(projects).map((projectName) => {
+			if (!projects[projectName].active) {
+				return { 
+					title: projectName, 
+					description: 'Show logs.', 
+					value: projects[projectName]
+				};
+			}
+			return undefined;
+		}).filter(item => !!item);
+
 		prompt({
 			type: 'select',
 			name: 'project',
-			message: 'Select a project',
-			choices: Object.keys(projects).map((projectName) => {
-				if (!projects[projectName].active) {
-					return { 
-						title: projectName, 
-						description: 'Show logs.', 
-						value: projects[projectName]
-					};
-				}
-				return undefined;
-			}).filter(item => !!item)
+			message: options.length ? 'Select a project' : 'Select a option',
+			choices: options.length ? options : [{ 
+				title: 'Close', 
+				description: 'Close all child process.', 
+				value: 'CLOSE'
+			}]
 		}, {
-			onCancel: () => {
-				Object.keys(projects).forEach((projectName) => {
-					kill(projects[projectName].child.pid);
-				});
-				console.log('All process has killed!');
-			}, 
+			onCancel: onProjectClose, 
 			onSubmit: onProjectSelect
 		});
 	};
