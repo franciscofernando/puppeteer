@@ -1,5 +1,5 @@
 # puppeteer
-handle multiple instances procedures in a one terminal instance
+handle multiple instances procedures in a one terminal instance 
 
 # Steps:
 1. Clone the repo
